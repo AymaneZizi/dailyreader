@@ -1,0 +1,211 @@
+﻿{% load staticfiles %}
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Daily Reader</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="Get your daily dose of technology whether it is microsft technologies or java or mobile technologies or you want to know the latest trends, it is one stop for all that information from arond the web" />
+		<meta name="keywords" content="Microsft Technologies, ASP.NET, Java, Mobile, Startups" />
+		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800" rel="stylesheet" type="text/css" />
+		<script src="{% static "reader/js/jquery.min.js" %}"></script>
+		<script src="{% static "reader/js/jquery.dropotron.min.js" %}"></script>
+		<script src="{% static "reader/js/config.js" %}"></script>
+		<script src="{% static "reader/js/skel.min.js" %}"></script>
+		<script src="{% static "reader/js/skel-panels.min.js" %}"></script>
+        <script src="{% static "reader/js/jquery.paginate.js" %}"></script>
+        
+		<noscript>
+			<link rel="stylesheet" href="{%static "reader/css/skel-noscript.css" %}" />
+			<link rel="stylesheet" href="{%static "reader/css/style.css" %}" />
+			<link rel="stylesheet" href="{%static "reader/css/style-desktop.css" %}" />
+			
+		</noscript>
+        <link rel="stylesheet" href="{%static "reader/css/pagination_style.css" %}" />
+	</head>
+	<body class="left-sidebar">
+		<!-- Header Wrapper -->
+			<div id="header-wrapper">
+				<div class="container">
+					<div class="row">
+						<div class="12u">
+								<header id="header">
+									<div class="inner">
+									
+										<!-- Logo -->
+											<h1><a href="#" id="logo">Daily Reader</a></h1>
+										
+										<!-- Nav -->
+											<nav id="nav">
+												<ul>
+													<li><a href="/reader/">Home</a></li>
+													<li>
+														<span>{{category}}</span>
+														<ul>
+                                                            {% for group in groups%}
+															    <li><a href="/reader/category/{{group.name}}">{{group.name}}</a></li>
+															{% endfor %}
+														</ul>
+													</li>
+													
+												</ul>
+											</nav>
+									
+									</div>
+								</header>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		
+		<!-- Main Wrapper -->
+			<div id="main-wrapper">
+				<div class="main-wrapper-style3">
+					<div class="inner">
+						<div class="container">
+							<div class="row">
+								<div class="8u">
+
+									<!-- Article list -->
+										<section class="box-article-list">
+											<h2 class="fa fa-file-text-o">From the blog</h2>
+											
+											<!-- Excerpt -->
+                                            {% for article in articles%}
+												<article class="box-excerpt">
+													
+													<div>
+														<header>
+															<span class="date">{{article.published}}:{{article.pcategoryid.name}}</span>
+															<h3><a onclick="increase_count_article({{article.id}})" href="{{article.link}}">{{article.header}}</a></h3>
+														</header>
+														<div>
+                                                            {{article.description | safe}}
+														</div>
+													</div>
+												</article>
+                                            {% endfor %}
+											
+										</section>
+								</div>
+								<div class="4u">
+								
+									<!-- Spotlight -->
+										<section class="box-spotlight">
+											<h2 class="fa fa-file-text-o">Spotlight</h2>
+                                            {% for article in spotlight_article%}
+											<article>
+												<header>
+													<h3><a onclick="increase_count_article({{article.id}})" href="{{article.link}}">{{article.header}}</a></h3>
+													<span class="byline">{{article.published}}:{{article.pcategoryid.name}}</span>
+												</header>
+												<p>
+                                                    {{article.description | safe}}
+                                                </p>
+											</article>
+                                            {% endfor %}
+										</section>
+                                    
+								</div>
+                                <div id="pagination"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		<!-- Footer Wrapper -->
+			<div id="footer-wrapper">
+				<footer id="footer" class="container">
+					<div class="row">
+						<div class="3u">
+						
+							<!-- Links -->
+								<section>
+									<h2>Filler Links</h2>
+									<ul class="style2">
+                                        {% for group in groups%}
+										<li><a href="/reader/category/{{group.name}}">{{group.name}}</a></li>
+                                        {% endfor %}
+									
+									</ul>
+								</section>
+						
+						</div>
+				
+						<div class="6u">
+						
+							<!-- About -->
+								<section>
+									<h2><strong>DailyReader</strong></h2>
+									<p>Hello! This is <strong>DailyReader</strong>, a free, fully responsive HTML5 site
+									for everyday dose of learning. It gets the content from differnt sites
+                                    through RSS Feed and then categorize them into predefined groups
+                                    </p>
+									
+								</section>
+						
+							<!-- Contact -->
+								<section>
+									<h2>Get in touch</h2>
+									<div>
+										<div class="row">
+											<div class="6u">
+												<dl class="contact">
+													<dt>Email</dt>
+													<dd><a href="mailto:virender@nagarro.com">virender@nagarro.com</a></dd>
+												</dl>
+											</div>
+										</div>
+									</div>
+								</section>
+						
+						</div>
+					</div>
+				</footer>
+                <form id="form_ajax_django">
+                    {% csrf_token %}
+                    <input type="hidden" id="article_id" name="article_id"/>
+                </form>
+                <input type="hidden" id="pageno" value="{{page}}">
+                <input type="hidden" id="totalarticles" value="{{totalarticles}}">
+                <input type="hidden" id="page_strength" value="{{page_strength}}">
+			</div>
+        <script type="text/javascript">
+            function increase_count_article(id) {
+                $("#article_id").val(id);
+                $("#form_ajax_django").submit();
+            }
+            $("#form_ajax_django").submit(function (e) {
+                e.preventDefault();
+                serializedData = $("#form_ajax_django").serialize();
+                alert("1")
+                $.ajax({
+                    url: "/reader/increase_count/",
+                    type: "post",
+                    data: serializedData,
+                    cache: 'false',
+                    dataType: "json",
+                    async: 'true',
+
+                    success: function (data) {
+                        alert(data)
+                    },
+                    error: function (data) {
+                       
+                    },
+                });
+            });
+                $("#pagination").pagination({
+                    items: 100,
+                    itemsOnPage: 10,
+                    cssStyle: 'light-theme',
+                    hrefTextPrefix: '/reader/category/{{category}}/page/',
+                    currentPage: $("#pageno").val(),
+                    items: $("#totalarticles").val(),
+                    itemsOnPage: $("#page_strength").val()
+                });
+         
+        </script>
+	</body>
+</html>
