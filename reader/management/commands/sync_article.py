@@ -8,3 +8,4 @@ class Command(BaseCommand):
         all_sites=Site.objects.all()
         for site in all_sites:
             site.save_articles_published_after_last_sync_time()
+        Article.delete_articles()

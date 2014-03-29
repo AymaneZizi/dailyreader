@@ -144,6 +144,12 @@ class Article(models.Model):
     count = models.IntegerField()
     
     @staticmethod
+    def delete_articles():
+        count=Article.objects.count()
+        if count>MAX_NO_OF_ARTICLES_ALLOWED:
+            Article.objects.order_by("-published")[MAX_NO_OF_ARTICLES_ALLOWED-1:count].delete()        
+    
+    @staticmethod
     def increase_count(id):
         print "increased_count"
         entry=Article.objects.get(id=id)

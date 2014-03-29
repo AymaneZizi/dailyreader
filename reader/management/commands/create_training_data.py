@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 import os
 import feedparser
 import re
-MAX_ARTICLES_IN_DATABASE=500
+MAX_ARTICLES_IN_DATABASE=10
 
 
 urls=[
@@ -30,7 +30,9 @@ urls=[
 "http://feeds.oreilly.com/oreilly/java?format=xml",
 "http://feeds.dzone.com/javalobby/frontpage?format=xml",
 "http://www.theserverside.com/rss/forum.tss?forum_id=2?format=xml",
-"http://www.artima.com/spotlight/feeds/spotlight.rss?format=xml"
+"http://www.artima.com/spotlight/feeds/spotlight.rss?format=xml",
+"http://feeds.feedburner.com/TechCrunch?format=xml",
+"http://mashable.com/category/rss-feed/"
 
 
 
