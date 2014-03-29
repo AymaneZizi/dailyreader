@@ -147,7 +147,8 @@ class Article(models.Model):
     def delete_articles():
         count=Article.objects.count()
         if count>MAX_NO_OF_ARTICLES_ALLOWED:
-            Article.objects.order_by("-published")[MAX_NO_OF_ARTICLES_ALLOWED-1:count].delete()        
+            objects_to_keep=Article.objects.order_by("-published")[:MAX_NO_OF_ARTICLES_ALLOWED].delete()  
+            Article.objects.exclude(pk__in=objects_to_keep).delete()      
     
     @staticmethod
     def increase_count(id):
