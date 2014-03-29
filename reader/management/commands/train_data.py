@@ -51,7 +51,7 @@ def get_pcategory(category_name,list_p_category):
 class Command(BaseCommand):
     def handle(self,*args, **options):
         lines=[]
-        with open(os.getcwd()+"\\reader\\management\\commands\\"+"training_data.csv","r") as file:
+        with open(os.getcwd()+"/reader/management/commands/"+"training_data.csv","r") as file:
             lines=file.readlines()
         training_data=[]
         for line in lines:
