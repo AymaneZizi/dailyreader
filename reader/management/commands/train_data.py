@@ -6,10 +6,10 @@ from topia.termextract import extract
 
 
 MAX_ARTICLES_IN_DATABASE=500
-MIN_FREQUENCY_OF_KEY_WORD=0.12
-NO_OF_PCATEGORY = 5
+MIN_FREQUENCY_OF_KEY_WORD=0.05
+NO_OF_PCATEGORY = 4
 
-MIN_PROBABILITY = 0.25
+
 
 alphabets={'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
            'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'}
@@ -29,6 +29,7 @@ def is_not_alphanumeric(word):
 class Category_Training:
     def __init__(self):
         self.document_count=0
+        self.word_count=0
         self.index=0
         self.name=""
 
@@ -51,6 +52,9 @@ def get_pcategory(category_name,list_p_category):
 class Command(BaseCommand):
     def handle(self,*args, **options):
         lines=[]
+        Features.objects.all().delete()
+        PCategory.objects.all().delete()
+        Article.objects.all().delete()
         with open(os.getcwd()+"/reader/management/commands/"+"training_data.csv","r") as file:
             lines=file.readlines()
         training_data=[]
@@ -90,18 +94,14 @@ class Command(BaseCommand):
                     #print word[0]
                     new_key_word=Key_Word_Training()
                     key_words[word[0].lower()]=new_key_word
-                  
                 # increasing the count
                 category_object=categories[category]
                 key_word_object = key_words[word[0].lower()]
                 key_word_object.name=word[0].lower()
-                key_for_category=str(category_object.index)
-                
-            
-                
+                key_for_category=str(category_object.index)    
                 count_key_words=key_word_object.dict_category_count
                 count_document_key_words=key_word_object.dict_count_document_present
-               
+                category_object.word_count=category_object.word_count+word[1]
                 if  key_for_category in count_key_words:
                     #print word[1]
                     count_key_words[key_for_category]=count_key_words[key_for_category]+word[1]
@@ -121,26 +121,31 @@ class Command(BaseCommand):
             check_include_feature=0
             dict_count_category=key_words[word].dict_category_count
             dict_count_documents_category=key_words[word].dict_count_document_present
-           
             for category in categories.keys():
                 document_count= categories[category].document_count
+                vocab_count = categories[category].word_count
                 category_key=str(categories[category].index)
                 probability_for_category=0
                 frquency_for_category=0
                 frquency_for_category=0
                 total_count=key_words[word].total_count
+               
+                    
                 if category_key in dict_count_category:
                     frquency_for_category=float(dict_count_documents_category[category_key])/document_count
-                    probability_for_category=float(dict_count_category[category_key])/total_count
+                    probability_for_category=(float(dict_count_category[category_key]+1))/(2*vocab_count)
                     dict_probability=key_words[word].dict_probability
                     dict_probability[category_key]=probability_for_category
                     dict_frequency=key_words[word].dict_frequency
                     dict_frequency[category_key]=frquency_for_category
-                if frquency_for_category>MIN_FREQUENCY_OF_KEY_WORD and probability_for_category>MIN_PROBABILITY:
+                else:
+                    probability_for_category=float(1)/(2*vocab_count)
+                    dict_probability=key_words[word].dict_probability
+                    dict_probability[category_key]=probability_for_category
+                    
+                if frquency_for_category>MIN_FREQUENCY_OF_KEY_WORD:
                     check_include_feature=1
-           
-                
-                       
+                  
                 if check_include_feature:
                     if not (word.count('"')>0 or word.count("'")>0 or word.count("#")>0 or len(word.split(" "))>1 or is_not_alphanumeric(word)): 
                         refined_features[word]=key_words[word]
@@ -152,8 +157,9 @@ class Command(BaseCommand):
             listCategoriesModel[categories[key].index]=pcategory
  
          
-        print str(listCategoriesModel)
+        
         listFeaturesModel=[]
+        print len(refined_features.keys())
         for key in refined_features:
             count=0
             for key_category in categories:
@@ -178,14 +184,12 @@ class Command(BaseCommand):
         PCategory.objects.bulk_create(listCategoriesModel)
         pcategory_objects = PCategory.objects.all()
         
-#         for element in pcategory_objects:
-#             for key in element.keys():
-#                 print element[key]
-#             
         for element in listFeaturesModel:
             category_name = element.pcategory.name
-            print category_name
+            #print category_name
             pcategory = get_pcategory(category_name,pcategory_objects )
             element.pcategory=pcategory
-            
+        pcategory=PCategory()
+        pcategory.name=OTHER_KEY 
+        pcategory.save()
         Features.objects.bulk_create(listFeaturesModel)

@@ -37,15 +37,16 @@
 										<!-- Nav -->
 											<nav id="nav">
 												<ul>
-													<li><a href="/reader/">Home</a></li>
+													
 													<li>
 														<span>{{category}}</span>
 														<ul>
                                                             {% for group in groups%}
-															    <li><a href="/reader/category/{{group.name}}">{{group.name}}</a></li>
+															    <li><a href="/reader/category/{{group.name}}/type/{{type}}/page/1">{{group.name}}</a></li>
 															{% endfor %}
 														</ul>
 													</li>
+                                                    <li><a href="/reader/">Home</a></li>
 													
 												</ul>
 											</nav>
@@ -64,13 +65,18 @@
 					<div class="inner">
 						<div class="container">
 							<div class="row">
-								<div class="8u">
 
+                                <div class="6u">
+                                    <h2 class="fa fa-file-text-o"><a href="/reader/category/all/type/all/page/1">From the blog</a></h2>
+                                </div>
+                                <div class="6u">
+                                    <h2 class="fa fa-file-text-o"><a href="/reader/category/all/type/popular/page/1">Spotlight</a></h2>
+                                </div>
+                                 
+								<div class="12u">
 									<!-- Article list -->
 										<section class="box-article-list">
-											<h2 class="fa fa-file-text-o">From the blog</h2>
-											
-											<!-- Excerpt -->
+                                            <!-- Excerpt -->
                                             {% for article in articles%}
 												<article class="box-excerpt">
 													
@@ -88,25 +94,7 @@
 											
 										</section>
 								</div>
-								<div class="4u">
-								
-									<!-- Spotlight -->
-										<section class="box-spotlight">
-											<h2 class="fa fa-file-text-o">Spotlight</h2>
-                                            {% for article in spotlight_article%}
-											<article>
-												<header>
-													<h3><a onclick="increase_count_article({{article.id}})" href="{{article.link}}">{{article.header}}</a></h3>
-													<span class="byline">{{article.published}}:{{article.pcategoryid.name}}</span>
-												</header>
-												<p>
-                                                    {{article.description | safe}}
-                                                </p>
-											</article>
-                                            {% endfor %}
-										</section>
-                                    
-								</div>
+							
                                 <div id="pagination"></div>
 							</div>
 						</div>
@@ -125,7 +113,7 @@
 									<h2>Filler Links</h2>
 									<ul class="style2">
                                         {% for group in groups%}
-										<li><a href="/reader/category/{{group.name}}">{{group.name}}</a></li>
+										<li><a href="/reader/category/{{group.name}}/type/{{type}}/page/1">{{group.name}}</a></li>
                                         {% endfor %}
 									
 									</ul>
@@ -179,7 +167,7 @@
             $("#form_ajax_django").submit(function (e) {
                 e.preventDefault();
                 serializedData = $("#form_ajax_django").serialize();
-                alert("1")
+       
                 $.ajax({
                     url: "/reader/increase_count/",
                     type: "post",
@@ -200,7 +188,7 @@
                     items: 100,
                     itemsOnPage: 10,
                     cssStyle: 'light-theme',
-                    hrefTextPrefix: '/reader/category/{{category}}/page/',
+                    hrefTextPrefix: '/reader/category/{{category_value}}/type/{{type}}/page/',
                     currentPage: $("#pageno").val(),
                     items: $("#totalarticles").val(),
                     itemsOnPage: $("#page_strength").val()

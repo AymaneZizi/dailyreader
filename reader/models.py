@@ -52,18 +52,23 @@ class Site(models.Model):
             article.link=entry.link
             article.count=0
             article.description=entry.description.encode('utf-8')
-            try:
+            if hasattr(entry, 'published'):
                 article.published=parser.parse(entry.published)
-            except:
+            elif hasattr(entry, 'created'):
+                article.published=parser.parse(entry.created)
+            elif hasattr(entry, 'updated'):
+                article.published=parser.parse(entry.updated)
+            else:
                 current_date_time = datetime.datetime.now()
                 article.published = datetime.datetime(current_date_time.year,current_date_time.month,current_date_time.day, current_date_time.hour, current_date_time.minute,current_date_time.second, tzinfo=tzutc())
-                pass
+        
             article.siteid=self
-            article.get_pcategory(list_category, dict_features)
+           
             if not article.published.tzinfo or not article.published.tzinfo.utcoffset:
                 temp_date = article.published
                 article.published = datetime.datetime(temp_date.year,temp_date.month,temp_date.day, temp_date.hour, temp_date.minute,temp_date.second, tzinfo=tzutc())
             if article.published>self.last_published_article_time:
+                article.get_pcategory(list_category, dict_features)
                 articles.append(article)
                 if article.published>last_published_article_time:
                     last_published_article_time=article.published
@@ -170,20 +175,33 @@ class Article(models.Model):
         return articles
     
     @staticmethod
-    def fetch_articles(offset_from_latest=0,no_of_articles=10,category=""):
+    def fetch_articles(offset_from_latest=0,no_of_articles=10,category="",type=TYPE_ALL):
         start_point = offset_from_latest-1
         end_point = start_point + no_of_articles
-        if len(category)==0:
-            if start_point<0:
-                query=Article.objects.select_related().order_by("-published")[:end_point]
+        if type==TYPE_ALL:
+            if category==CATEGORY_ALL:
+                if start_point<0:
+                    query=Article.objects.select_related().order_by("-published")[:end_point]
+                else:
+                    query=Article.objects.select_related().order_by("-published")[start_point:end_point]
             else:
-                query=Article.objects.select_related().order_by("-published")[start_point:end_point]
-        else:
-
-            if start_point<0:
-                query=Article.objects.filter(pcategoryid__name__contains=category).select_related().order_by("-published")[:end_point]
+    
+                if start_point<0:
+                    query=Article.objects.filter(pcategoryid__name__contains=category).select_related().order_by("-published")[:end_point]
+                else:
+                    query=Article.objects.filter(pcategoryid__name__contains=category).select_related().order_by("-published")[start_point:end_point]
+        elif type==TYPE_POPULAR:
+            if category==CATEGORY_ALL:
+                if start_point<0:
+                    query=Article.objects.select_related().order_by("-count")[:end_point]
+                else:
+                    query=Article.objects.select_related().order_by("-count")[start_point:end_point]
             else:
-                query=Article.objects.filter(pcategoryid__name__contains=category).select_related().order_by("-published")[start_point:end_point]
+    
+                if start_point<0:
+                    query=Article.objects.filter(pcategoryid__name__contains=category).select_related().order_by("-count")[:end_point]
+                else:
+                    query=Article.objects.filter(pcategoryid__name__contains=category).select_related().order_by("-count")[start_point:end_point]
 
         articles=[]
         for article in query:
@@ -209,17 +227,19 @@ class Article(models.Model):
     def get_pcategory(self,list_pcategory,dict_features):
         important_features=self.getImportaantFeatures()
         dict_scores_for_category={}
-      
+        vocab_of_document=1
+        vocab_of_keywords = 0
+        for key in important_features.keys():
+            vocab_of_document=vocab_of_document+important_features[key]
+            
         for feature in important_features.keys():
             if feature in dict_features:
+                print feature
+                vocab_of_keywords=vocab_of_keywords+important_features[feature]
                 for element in dict_features[feature]:
                     category= element.pcategory.name
                     score_value = element.probability
                     score_value=score_value+DELTA
-#                     print category
-#                     print feature
-#                     print score_value
-#                     print "*****"
                     log_value = important_features[feature]*log(score_value,10)
                     if category in dict_scores_for_category:
                         dict_scores_for_category[category]=dict_scores_for_category[category]+log_value
@@ -228,11 +248,12 @@ class Article(models.Model):
                         
         print dict_scores_for_category
         min_value = log(MIN_LIMIT,10)
+        min_key_word_count = RATIO_KEY_WORD_REQUIRED
         print min_value
         p_category_key=None
-    
+        value_count_key_word = float(vocab_of_keywords)/vocab_of_document
         for key in dict_scores_for_category.keys():
-            if dict_scores_for_category[key]>=min_value:
+            if dict_scores_for_category[key]>=min_value and value_count_key_word>=min_key_word_count :
                 min_value = dict_scores_for_category[key]
                 p_category_key = key
         

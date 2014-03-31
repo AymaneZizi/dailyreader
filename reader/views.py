@@ -4,29 +4,31 @@ from models import *
 from constants.app_constants import *
 import json
 
-def index(request,pageno=1,category=""):
+def index(request,pageno=1,category=CATEGORY_ALL,type=TYPE_ALL):
     pageno=int(pageno)-1
-    if len(category)!=0:
-       
+    if category!=CATEGORY_ALL:
         no_of_articles=Article.objects.filter(pcategoryid__name__contains=category).count()
     else:
         no_of_articles=Article.objects.count()
 
     items_on_one_page=NO_OF_ITEMS_ON_A_PAGE
     list_groups = PCategory.get_categories()
-    list_article=Article.fetch_articles((pageno)*10, items_on_one_page,category=category)
-    list_spotlight_article = Article.get_spotlight_articles(5)
+    list_article=Article.fetch_articles((pageno)*10, items_on_one_page,category=category,type=type)
+    #list_spotlight_article = Article.get_spotlight_articles(5)
     template_value={}
-    if len(category)==0:
+    if category==CATEGORY_ALL:
         template_value["category"]='Select Categories'
     else:
-        template_value["category"]=".........."+category
+        template_value["category"]=category
+    
     template_value["articles"]=list_article
     template_value["groups"]=list_groups
     template_value["page"]=pageno+1
     template_value["totalarticles"]=no_of_articles
     template_value["page_strength"]=items_on_one_page
-    template_value["spotlight_article"]=list_spotlight_article
+    template_value["category_value"]=category
+    #template_value["spotlight_article"]=list_spotlight_article
+    template_value["type"]=type
     return render(request, 'reader/home.html', template_value)
 
 

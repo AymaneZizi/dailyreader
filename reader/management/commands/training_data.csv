@@ -381,4 +381,3 @@ This article addresses the ways in which JRebel has made an impact on how develo
 "What is the largest double that could in theory be produced by Math.random()? In this newsletter, we look at ways to calculate this based on the 48-bit random generator available in standard Java. We also prove why in a single-threaded program, (int)(Random.nextDouble() + 1) can never be rounded up to",Java
 I'm not talking about the early adopters writing obscure code here -- that can probably be solved with a suitable style guide. I just debugged my way through an example that should have been trivial but I only figured out becau,Java
 "In order for HTML5 to become the true user interface technology of the future, servers must be able to transparently push data to clients. People have been trying to do this for a long time, and WebSockets look like they will solve the problem once and for a",Java
-others,Others
