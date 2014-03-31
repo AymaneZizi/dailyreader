@@ -7,10 +7,10 @@ https://docs.djangoproject.com/en/1.6/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
-# import dj_database_url
-# DATABASES = {}
-# DATABASES['default'] =  dj_database_url.config()
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+import dj_database_url
+DATABASES = {}
+DATABASES['default'] =  dj_database_url.config()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -56,16 +56,16 @@ ROOT_URLCONF = 'DailyReader.urls'
 WSGI_APPLICATION = 'DailyReader.wsgi.application'
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
-DATABASES = {
-    'default': {
-        'ENGINE':'django.db.backends.postgresql_psycopg2',
-        'NAME': 'DailyReader',
-        'USER': 'postgres',
-        'PASSWORD': 'Passw0rd',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE':'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'DailyReader',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Passw0rd',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
