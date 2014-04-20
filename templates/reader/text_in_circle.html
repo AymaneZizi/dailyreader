@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        
+        function setStyle(element, radius, angle, xcenter, ycenter) {
+            element = $(element)
+            var left = xcenter + radius * Math.cos(angle)
+            var top = ycenter - radius * Math.sin(angle)
+            element.css({ top: top, left: left });
+            var angleradian = ((angle - Math.PI / 2))*-1
+            var cosangle = Math.cos(angleradian)
+            var sinangle = Math.sin(angleradian)
+          
+            angle =  (((angle / Math.PI) * 180-90)*-1).toString();
+            
+            var rotateCSSValue = "rotate(".concat(angle).concat("deg").concat(")");
+            element.css("-webkit-transform", rotateCSSValue);
+            element.css("-moz-transform", rotateCSSValue);
+            element.css("-ms-transform", rotateCSSValue);
+            element.css("-o-transform", rotateCSSValue);
+            element.css("transform", rotateCSSValue);
+            if (navigator.appVersion.indexOf("MSIE 7.") != -1 || navigator.appVersion.indexOf("MSIE 8.") != -1)
+            {
+                var degreeValue = "sizingMethod='auto expand',M11=".concat(cosangle.toString()).concat(",M12=").concat((sinangle * -1).toString()).concat(",M21=").concat(sinangle.toString()).concat(",M22=").concat(cosangle.toString())
+                element.css("filter","progid:DXImageTransform.Microsoft.Matrix(".concat(degreeValue).concat(")"))
+                element.css("-ms-filter","progid:DXImageTransform.Microsoft.Matrix(".concat(degreeValue).concat(")"))
+              
+            }
+        }
+        function drawTextInCircle(angle) {
+            var div = $(document.getElementById("test"));
+            var width = div.width();
+            var height = div.height();
+            var text = $.trim(div.html());
+            var inner_html = ""
+            var width_span = 0
+            var height_span =0
+            // put text in span
+            for (var iterate = 0; iterate < text.length; iterate++) {
+                if (navigator.appVersion.indexOf("MSIE 7.") != -1)
+                {
+                    inner_html = inner_html.concat("<div class='rotate'>").concat(text.charAt(iterate)).concat("</div>")
+                }
+                else{
+                    inner_html = inner_html.concat("<div class='rotate'>").concat(text[iterate]).concat("</div>")
+                }
+            }
+            div.html(inner_html)
+
+            var position = div.position()
+            var top = position.top
+            var left = position.left
+
+            // get center point
+            var xcenter = left + width / 2;
+            var ycenter = top + height / 2;
+            var outer_radius = 0;
+            if (width > height) {
+                outer_radius = height/2;
+            }
+            else {
+                outer_radius = width/2;
+            }
+           
+            angle = ((angle) / 180) * Math.PI
+            var radius = outer_radius - height_span
+            $('#test').children('div').each(function () {
+                
+                width_span = $(this).width()+3;
+                //alert(width_span)
+                height_span = $(this).height()+2;
+                setStyle(this, radius, angle, xcenter, ycenter);
+                var delta = (Math.asin((width_span) /( 2*(outer_radius - height_span))))
+                angle = angle - delta;
+            
+            });
+
+
+          }
+</script>
+    <style>
+
+      
+       .rotate
+        {
+            float:left;
+            position:absolute
+        }
+
+    </style>
+</head>
+
+
+<body>
+    <div style="width:100px; height:100px" id="test">
+        Check Text
+    </div>
+    <script type="text/javascript">
+        drawTextInCircle(90);
+    </script>
+</body>
+</html>
