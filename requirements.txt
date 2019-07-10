@@ -1,5 +1,4 @@
 Django==1.6.1
-http://effbot.org/media/downloads/Imaging-1.1.7.tar.gz
 dj-database-url==0.3.0
 dj-static==0.0.5
 django-toolbelt==0.0.1
