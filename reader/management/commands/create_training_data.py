@@ -7,7 +7,7 @@ MAX_ARTICLES_IN_DATABASE=10
 
 
 urls=[
-"http://msdn.microsoft.com/en-us/magazine/rss/default.aspx?z=z&iss=1",
+"https://www.aljazeera.com/xml/rss/all.xml",
 "http://blogs.msdn.com/b/mainfeed.aspx",
 "http://www.asp.net/rss/spotlight",
 "http://visualstudiomagazine.com/rss-feeds/blogs.aspx"
