@@ -5,7 +5,8 @@ from models import *
 class SiteTestCase(TestCase):
     def test_site_fetching_rss_feed_working(self):
         site = Site()
-        site.url="http://msdn.microsoft.com/en-us/magazine/rss/default.aspx?z=z&iss=1"
+        site.url="https://www.aljazeera.com/xml/rss/all.xml"
+        #site.url="http://msdn.microsoft.com/en-us/magazine/rss/default.aspx?z=z&iss=1"
         articles = site.get_all_articles_published_after_last_sync_time()
 
 
